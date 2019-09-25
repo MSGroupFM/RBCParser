@@ -110,11 +110,11 @@ foreach ($document->find('.js-news-feed-list')[0]->xpath('//a') as $link)
                         {
                             $post->content[] = new Element('p', trim($element->text()));
                         }
-                        elseif ($element->matches('.article__picture') && trim($element->text()) != '')
+                        elseif ($element->matches('.article__picture') || $element->matches('.article__picture_big'))
                         {
                             $figure = new Element('figure', null, ['class' => 'figure']);
                             $figure->appendChild(new Element('img', null, ['class' => 'figure-img img-fluid rounded', 'src' => $element->find('img')[0]->getAttribute('src')]));
-                            $figure->appendChild(new Element('figcaption', str_replace('/\s/', ' ', $element->find('.article__picture__title')[0]->text()), ['class' => 'figure-caption']));
+                            if($element->has('.article__picture__title')) $figure->appendChild(new Element('figcaption', str_replace('/\s/', ' ', $element->find('.article__picture__title')[0]->text()), ['class' => 'figure-caption']));
                             $post->content[] = $figure;
                             unset($figure);
                         }
