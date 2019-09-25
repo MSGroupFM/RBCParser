@@ -100,11 +100,23 @@ foreach ($document->find('.js-news-feed-list')[0]->xpath('//a') as $link)
                 // В некоторых новостях последний абзац отделяется баннером и не входит в itemprop="articleBody"
                 foreach ($document->find('.article__text') as $content)
                 {
-                    foreach ($content->xpath('//p') as $element)
+                    foreach ($content->children() as $element)
                     {
-                        if(trim($element->text()) != '')
+                        if($element->matches('.article__subheader') && trim($element->text()) != '')
+                        {
+                            $post->content[] = new Element('h2', trim($element->text()));
+                        }
+                        elseif($element->matches('p') && trim($element->text()) != '')
                         {
                             $post->content[] = new Element('p', trim($element->text()));
+                        }
+                        elseif ($element->matches('.article__picture') && trim($element->text()) != '')
+                        {
+                            $figure = new Element('figure', null, ['class' => 'figure']);
+                            $figure->appendChild(new Element('img', null, ['class' => 'figure-img img-fluid rounded', 'src' => $element->find('img')[0]->getAttribute('src')]));
+                            $figure->appendChild(new Element('figcaption', str_replace('/\s/', ' ', $element->find('.article__picture__title')[0]->text()), ['class' => 'figure-caption']));
+                            $post->content[] = $figure;
+                            unset($figure);
                         }
                     }
                 }
@@ -153,12 +165,5 @@ foreach ($document->find('.js-news-feed-list')[0]->xpath('//a') as $link)
         </tbody>
     </table>
 </div>
-
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-        crossorigin="anonymous"></script>
 </body>
 </html>
